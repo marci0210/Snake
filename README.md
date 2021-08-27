@@ -1,1 +1,1 @@
-You have to download, and include the SLD2 to build this project.
+You have to download, and include the SDL2 to build this project.
