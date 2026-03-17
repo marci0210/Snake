@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://ihiktphopn3t"]
+
+[ext_resource type="Texture2D" uid="uid://q6qdwusyf0fn" path="res://assets/textures/snake_body.png" id="1_tcaf7"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_d6xnx"]
+
+[node name="SnakeArea2D" type="Area2D" unique_id=1518778878]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1365941054]
+shape = SubResource("RectangleShape2D_d6xnx")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1890069768]
+rotation = 3.1415927
+texture = ExtResource("1_tcaf7")

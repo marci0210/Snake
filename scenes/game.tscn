@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://n3xlngm7a0fy" path="res://assets/textures/wall.png" id="2_yqjtg"]
 [ext_resource type="Script" uid="uid://cvddp8t3ufdfx" path="res://scripts/snake.gd" id="4_iywne"]
 [ext_resource type="Texture2D" uid="uid://dr60ts270ftii" path="res://assets/textures/snake_head.png" id="4_lbhrr"]
+[ext_resource type="PackedScene" uid="uid://ihiktphopn3t" path="res://scenes/BodySegments.tscn" id="6_gee14"]
 [ext_resource type="Texture2D" uid="uid://bfihi4we7dryf" path="res://assets/textures/apple.png" id="6_p57ef"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_lnu2h"]
@@ -74,10 +75,12 @@ tile_set = SubResource("TileSet_lbhrr")
 position = Vector2(420, 420)
 up_direction = Vector2(1, -4.761905e-06)
 script = ExtResource("4_iywne")
+body_segment_scene = ExtResource("6_gee14")
 
 [node name="RayCast2D" type="RayCast2D" parent="CharacterBody2D" unique_id=804214844]
 target_position = Vector2(20, 0)
 collision_mask = 3
+collide_with_areas = true
 
 [node name="Collison_head" type="CollisionShape2D" parent="CharacterBody2D" unique_id=219249117]
 z_index = 1
@@ -87,17 +90,22 @@ shape = SubResource("RectangleShape2D_iywne")
 rotation = 3.1415927
 texture = ExtResource("4_lbhrr")
 
-[node name="Area2D" type="Area2D" parent="." unique_id=1758610149]
+[node name="SnakeArea2D" parent="." unique_id=1518778878 instance=ExtResource("6_gee14")]
+position = Vector2(-100, 400)
+
+[node name="ObjectArea2D" type="Area2D" parent="." unique_id=1758610149]
 position = Vector2(420, 220)
+collision_layer = 2
+collision_mask = 2
 script = SubResource("GDScript_p57ef")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1049078244]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ObjectArea2D" unique_id=1049078244]
 light_mask = 2
 visibility_layer = 2
 shape = SubResource("RectangleShape2D_u5sy4")
 
-[node name="Sprite2D" type="Sprite2D" parent="Area2D" unique_id=57889442]
+[node name="Sprite2D" type="Sprite2D" parent="ObjectArea2D" unique_id=57889442]
 texture = ExtResource("6_p57ef")
 
 [connection signal="pressed" from="PauseMenu/QuitButton" to="PauseMenu" method="_on_quit_button_pressed"]
-[connection signal="body_entered" from="Area2D" to="CharacterBody2D" method="_on_area_2d_body_entered"]
+[connection signal="body_entered" from="ObjectArea2D" to="CharacterBody2D" method="_on_area_2d_body_entered"]
