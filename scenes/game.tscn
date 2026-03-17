@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://n3xlngm7a0fy" path="res://assets/textures/wall.png" id="2_yqjtg"]
 [ext_resource type="Script" uid="uid://cvddp8t3ufdfx" path="res://scripts/snake.gd" id="4_iywne"]
 [ext_resource type="Texture2D" uid="uid://dr60ts270ftii" path="res://assets/textures/snake_head.png" id="4_lbhrr"]
+[ext_resource type="Texture2D" uid="uid://bfihi4we7dryf" path="res://assets/textures/apple.png" id="6_p57ef"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_lnu2h"]
 texture = ExtResource("2_yqjtg")
@@ -16,6 +17,18 @@ texture_region_size = Vector2i(40, 40)
 tile_size = Vector2i(40, 40)
 physics_layer_0/collision_layer = 1
 sources/0 = SubResource("TileSetAtlasSource_lnu2h")
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_iywne"]
+size = Vector2(40, 40)
+
+[sub_resource type="GDScript" id="GDScript_p57ef"]
+script/source = "extends Area2D
+
+func _on_area_2d_body_entered(body: CharacterBody2D) -> void:
+	print(\"body entered\")
+"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_u5sy4"]
 
 [node name="Game" type="Node2D" unique_id=810544287]
 
@@ -39,6 +52,20 @@ offset_right = 800.0
 offset_bottom = 800.0
 color = Color(1, 0.77254903, 0.47058824, 1)
 
+[node name="Score_Label" type="Label" parent="CanvasLayer" unique_id=346626125]
+offset_left = 40.0
+offset_right = 140.0
+offset_bottom = 40.0
+theme_override_font_sizes/font_size = 28
+text = "SCORE:"
+
+[node name="Score" type="Label" parent="CanvasLayer" unique_id=605709623]
+offset_left = 140.0
+offset_right = 200.0
+offset_bottom = 40.0
+theme_override_font_sizes/font_size = 28
+text = "0"
+
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=769716475]
 tile_map_data = PackedByteArray("AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAACAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAJAAAAAAAAAAAAAAAKAAAAAAAAAAAAAAALAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAANAAAAAAAAAAAAAAAOAAAAAAAAAAAAAAAPAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAARAAAAAAAAAAAAAAASAAAAAAAAAAAAAAATAAAAAAAAAAAAAAATAAEAAAAAAAAAAAATAAIAAAAAAAAAAAATAAMAAAAAAAAAAAATAAQAAAAAAAAAAAATAAUAAAAAAAAAAAATAAYAAAAAAAAAAAATAAcAAAAAAAAAAAATAAgAAAAAAAAAAAATAAkAAAAAAAAAAAATAAoAAAAAAAAAAAATAAsAAAAAAAAAAAATAAwAAAAAAAAAAAATAA0AAAAAAAAAAAATAA4AAAAAAAAAAAATAA8AAAAAAAAAAAATABAAAAAAAAAAAAATABEAAAAAAAAAAAATABIAAAAAAAAAAAATABMAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA8AAAAAAAAAAAAAABAAAAAAAAAAAAAAABEAAAAAAAAAAAAAABIAAAAAAAAAAAAAABMAAAAAAAAAAAABABMAAAAAAAAAAAACABMAAAAAAAAAAAADABMAAAAAAAAAAAAEABMAAAAAAAAAAAAFABMAAAAAAAAAAAAGABMAAAAAAAAAAAAHABMAAAAAAAAAAAAIABMAAAAAAAAAAAAJABMAAAAAAAAAAAAKABMAAAAAAAAAAAALABMAAAAAAAAAAAAMABMAAAAAAAAAAAANABMAAAAAAAAAAAAOABMAAAAAAAAAAAAPABMAAAAAAAAAAAAQABMAAAAAAAAAAAARABMAAAAAAAAAAAASABMAAAAAAAAAAAA=")
 tile_set = SubResource("TileSet_lbhrr")
@@ -48,8 +75,30 @@ position = Vector2(420, 420)
 up_direction = Vector2(1, -4.761905e-06)
 script = ExtResource("4_iywne")
 
+[node name="RayCast2D" type="RayCast2D" parent="CharacterBody2D" unique_id=804214844]
+target_position = Vector2(20, 0)
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D" unique_id=219249117]
+z_index = 1
+shape = SubResource("RectangleShape2D_iywne")
+
 [node name="Sprite2D" type="Sprite2D" parent="CharacterBody2D" unique_id=984764743]
 rotation = 3.1415927
 texture = ExtResource("4_lbhrr")
 
+[node name="Area2D" type="Area2D" parent="." unique_id=1758610149]
+script = SubResource("GDScript_p57ef")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1049078244]
+light_mask = 2
+visibility_layer = 2
+position = Vector2(420, 220)
+shape = SubResource("RectangleShape2D_u5sy4")
+
+[node name="Sprite2D" type="Sprite2D" parent="Area2D" unique_id=57889442]
+position = Vector2(420, 220)
+texture = ExtResource("6_p57ef")
+
 [connection signal="pressed" from="PauseMenu/QuitButton" to="PauseMenu" method="_on_quit_button_pressed"]
+[connection signal="body_entered" from="Area2D" to="CharacterBody2D" method="_on_area_2d_body_entered"]
