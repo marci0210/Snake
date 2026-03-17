@@ -1,0 +1,55 @@
+[gd_scene format=4 uid="uid://cuhg20xdbonnx"]
+
+[ext_resource type="Script" uid="uid://dus5b8echu40s" path="res://scripts/pause_menu.gd" id="1_lnu2h"]
+[ext_resource type="Texture2D" uid="uid://c5hhbt1wpl0lf" path="res://assets/textures/quit.png" id="1_uwrxv"]
+[ext_resource type="Texture2D" uid="uid://n3xlngm7a0fy" path="res://assets/textures/wall.png" id="2_yqjtg"]
+[ext_resource type="Script" uid="uid://cvddp8t3ufdfx" path="res://scripts/snake.gd" id="4_iywne"]
+[ext_resource type="Texture2D" uid="uid://dr60ts270ftii" path="res://assets/textures/snake_head.png" id="4_lbhrr"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_lnu2h"]
+texture = ExtResource("2_yqjtg")
+texture_region_size = Vector2i(40, 40)
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-20, -20, 20, -20, 20, 20, -20, 20)
+
+[sub_resource type="TileSet" id="TileSet_lbhrr"]
+tile_size = Vector2i(40, 40)
+physics_layer_0/collision_layer = 1
+sources/0 = SubResource("TileSetAtlasSource_lnu2h")
+
+[node name="Game" type="Node2D" unique_id=810544287]
+
+[node name="PauseMenu" type="CanvasLayer" parent="." unique_id=2012011511]
+process_mode = 3
+visible = false
+script = ExtResource("1_lnu2h")
+
+[node name="QuitButton" type="TextureButton" parent="PauseMenu" unique_id=754716282]
+offset_left = 268.0
+offset_top = 373.0
+offset_right = 568.0
+offset_bottom = 473.0
+texture_normal = ExtResource("1_uwrxv")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=347656747]
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer" unique_id=1699517791]
+visible = false
+offset_right = 800.0
+offset_bottom = 800.0
+color = Color(1, 0.77254903, 0.47058824, 1)
+
+[node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=769716475]
+tile_map_data = PackedByteArray("AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAACAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAJAAAAAAAAAAAAAAAKAAAAAAAAAAAAAAALAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAANAAAAAAAAAAAAAAAOAAAAAAAAAAAAAAAPAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAARAAAAAAAAAAAAAAASAAAAAAAAAAAAAAATAAAAAAAAAAAAAAATAAEAAAAAAAAAAAATAAIAAAAAAAAAAAATAAMAAAAAAAAAAAATAAQAAAAAAAAAAAATAAUAAAAAAAAAAAATAAYAAAAAAAAAAAATAAcAAAAAAAAAAAATAAgAAAAAAAAAAAATAAkAAAAAAAAAAAATAAoAAAAAAAAAAAATAAsAAAAAAAAAAAATAAwAAAAAAAAAAAATAA0AAAAAAAAAAAATAA4AAAAAAAAAAAATAA8AAAAAAAAAAAATABAAAAAAAAAAAAATABEAAAAAAAAAAAATABIAAAAAAAAAAAATABMAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA8AAAAAAAAAAAAAABAAAAAAAAAAAAAAABEAAAAAAAAAAAAAABIAAAAAAAAAAAAAABMAAAAAAAAAAAABABMAAAAAAAAAAAACABMAAAAAAAAAAAADABMAAAAAAAAAAAAEABMAAAAAAAAAAAAFABMAAAAAAAAAAAAGABMAAAAAAAAAAAAHABMAAAAAAAAAAAAIABMAAAAAAAAAAAAJABMAAAAAAAAAAAAKABMAAAAAAAAAAAALABMAAAAAAAAAAAAMABMAAAAAAAAAAAANABMAAAAAAAAAAAAOABMAAAAAAAAAAAAPABMAAAAAAAAAAAAQABMAAAAAAAAAAAARABMAAAAAAAAAAAASABMAAAAAAAAAAAA=")
+tile_set = SubResource("TileSet_lbhrr")
+
+[node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=955675134]
+position = Vector2(420, 420)
+up_direction = Vector2(1, -4.761905e-06)
+script = ExtResource("4_iywne")
+
+[node name="Sprite2D" type="Sprite2D" parent="CharacterBody2D" unique_id=984764743]
+rotation = 3.1415927
+texture = ExtResource("4_lbhrr")
+
+[connection signal="pressed" from="PauseMenu/QuitButton" to="PauseMenu" method="_on_quit_button_pressed"]
