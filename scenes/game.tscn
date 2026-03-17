@@ -88,16 +88,15 @@ rotation = 3.1415927
 texture = ExtResource("4_lbhrr")
 
 [node name="Area2D" type="Area2D" parent="." unique_id=1758610149]
+position = Vector2(420, 220)
 script = SubResource("GDScript_p57ef")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1049078244]
 light_mask = 2
 visibility_layer = 2
-position = Vector2(420, 220)
 shape = SubResource("RectangleShape2D_u5sy4")
 
 [node name="Sprite2D" type="Sprite2D" parent="Area2D" unique_id=57889442]
-position = Vector2(420, 220)
 texture = ExtResource("6_p57ef")
 
 [connection signal="pressed" from="PauseMenu/QuitButton" to="PauseMenu" method="_on_quit_button_pressed"]

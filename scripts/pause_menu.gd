@@ -22,5 +22,8 @@ func toggle_pause():
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _on_quit_button_pressed() -> void:
+	var current_score = get_parent().get_node("CanvasLayer/Score")
+	Global.update_overall_high_score(int(current_score.text))
+		
 	get_tree().paused = false
 	get_tree().change_scene_to_file("res://scenes/homepage.tscn")
