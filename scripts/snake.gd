@@ -1,34 +1,37 @@
 extends CharacterBody2D
 
 @export var tile_map: TileMapLayer
-
-@onready var design = $Sprite2D
+@onready var design = $Sprite2D_head
 
 var grid_size = 40
 var move_delay = 0.5
 var time_until_next_move = 0.0
+
 var current_direction = Vector2.RIGHT
+var new_target_direction = Vector2.ZERO
+
 var is_moving = true
 var prev_time_stamp = 0
 
 func _physics_process(_delta):
-	var new_input_dir = Vector2.ZERO
 	if   Input.is_action_pressed("ui_up") and current_direction != Vector2.DOWN:    
-		new_input_dir = Vector2.UP
+		new_target_direction = Vector2.UP
 	elif Input.is_action_pressed("ui_down") and current_direction != Vector2.UP:  
-		new_input_dir = Vector2.DOWN
+		new_target_direction = Vector2.DOWN
 	elif Input.is_action_pressed("ui_left") and current_direction != Vector2.RIGHT:  
-		new_input_dir = Vector2.LEFT
+		new_target_direction = Vector2.LEFT
 	elif Input.is_action_pressed("ui_right") and current_direction != Vector2.LEFT: 
-		new_input_dir = Vector2.RIGHT
+		new_target_direction = Vector2.RIGHT
 
-	if new_input_dir != Vector2.ZERO:
-		current_direction = new_input_dir
 		
 	if time_until_next_move > 0:
 		time_until_next_move -= _delta
 		return
 	else:
+		if new_target_direction != Vector2.ZERO:
+			current_direction = new_target_direction
+		
+		# check there is no wall
 		$RayCast2D.target_position = current_direction * grid_size
 		$RayCast2D.force_raycast_update()
 		

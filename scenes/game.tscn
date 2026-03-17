@@ -79,11 +79,11 @@ script = ExtResource("4_iywne")
 target_position = Vector2(20, 0)
 collision_mask = 3
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D" unique_id=219249117]
+[node name="Collison_head" type="CollisionShape2D" parent="CharacterBody2D" unique_id=219249117]
 z_index = 1
 shape = SubResource("RectangleShape2D_iywne")
 
-[node name="Sprite2D" type="Sprite2D" parent="CharacterBody2D" unique_id=984764743]
+[node name="Sprite2D_head" type="Sprite2D" parent="CharacterBody2D" unique_id=984764743]
 rotation = 3.1415927
 texture = ExtResource("4_lbhrr")
 
