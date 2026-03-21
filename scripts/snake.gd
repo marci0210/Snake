@@ -20,6 +20,13 @@ var prev_time_stamp = 0
 @onready var curve_texture = preload("res://assets/textures/snake_curve.png")
 @onready var body_texture = preload("res://assets/textures/snake_body.png")
 
+@onready var fruits_texture : Array = [
+	preload("res://assets/textures/apple.png"),
+	preload("res://assets/textures/banana.png"),
+	preload("res://assets/textures/cherry.png"),
+	preload("res://assets/textures/pineapple.png")
+]
+
 func _ready():
 	$RayCast2D.target_position = current_direction * grid_size
 	$RayCast2D.force_raycast_update()
@@ -70,6 +77,7 @@ func _physics_process(_delta):
 		rotate_segments(current_direction)
 		
 		# in case of collision, update max score then exit
+		var object_picked_up = false
 		$RayCast2D.force_raycast_update()
 		if $RayCast2D.is_colliding():
 			var collider = $RayCast2D.get_collider()
@@ -81,10 +89,16 @@ func _physics_process(_delta):
 				Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 				get_tree().change_scene_to_file("res://scenes/homepage.tscn")
 			elif $RayCast2D.get_collider().collision_layer == 2: # object
+				object_picked_up = true
 				pick_up_object()
+				# add new segment to the Snake
+				add_initial_segments()
 		
 		# then move the segments
 		move_to_grid(current_direction)
+		
+		if object_picked_up:
+			generate_new_object()
 		
 		time_until_next_move = move_delay
 		
@@ -117,18 +131,46 @@ func pick_up_object() -> void:
 	var current_score = get_parent().get_node("CanvasLayer/Score")
 	current_score.text = str(int(current_score.text) + 1)
 	
-	# add new segment to the Snake
-	add_initial_segments()
+	if int(current_score.text) == 5:
+		move_delay = 0.4
+	elif int(current_score.text) == 10:
+		move_delay = 0.3
+	elif int(current_score.text) == 15:
+		move_delay = 0.2
+	# todo: spawn bomb at 20
+	elif int(current_score.text) == 25:
+		move_delay = 0.1
 	
+func generate_new_object() -> void:
 	# generate new coordiante to the object
 	var object = get_parent().get_node("ObjectArea2D")
 	object.position = generate_random_grid_position()
 	
+	# generate random texture
+	var fruit_number = randi_range(0, 3)
+	print("new fruit number: " + str(fruit_number))
+	object.get_node("Sprite2D").set_texture(fruits_texture[fruit_number])
+	
 func generate_random_grid_position():
-	var random_x = randi_range(1, 18) 
-	var random_y = randi_range(1, 18)
+	var position_free : bool = false
+	while not position_free:
+		var random_x = randi_range(1, 18) 
+		var random_y = randi_range(1, 18)
+		
+		# todo: not generate under me
+		var new_pos = Vector2((random_x * grid_size) + 20, (random_y * grid_size) + 20)
+		position_free = is_cell_vacant(new_pos)
+		
+		if position_free:
+			return new_pos
 	
-	var new_pos = Vector2((random_x * grid_size) + 20, (random_y * grid_size) + 20)
+func is_cell_vacant(grid_pos: Vector2i) -> bool:
+	var tile_map_layer = get_parent().get_node("TileMapLayer")
+	var target_map_pos = tile_map_layer.local_to_map(Vector2(grid_pos))
 	
-	return new_pos
-	
+	for segment in body_segments:
+		if tile_map_layer.local_to_map(segment.position) == target_map_pos:
+			print("reserved!!!")
+			return false
+
+	return true
