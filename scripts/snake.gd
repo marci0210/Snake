@@ -17,6 +17,9 @@ var new_target_direction = Vector2.ZERO
 var is_moving = true
 var prev_time_stamp = 0
 
+@onready var curve_texture = preload("res://assets/textures/snake_curve.png")
+@onready var body_texture = preload("res://assets/textures/snake_body.png")
+
 func _ready():
 	$RayCast2D.target_position = current_direction * grid_size
 	$RayCast2D.force_raycast_update()
@@ -63,14 +66,11 @@ func _physics_process(_delta):
 			current_direction = new_target_direction
 			new_target_direction = Vector2.ZERO
 		
-		# check there is no wall
-		#$RayCast2D.target_position = current_direction * grid_size
-		#$RayCast2D.force_raycast_update()
-		
-		# first set the new direction of the head
-		#rotation = new_target_direction.angle()
+		# rotate the segments
+		rotate_segments(current_direction)
 		
 		# in case of collision, update max score then exit
+		$RayCast2D.force_raycast_update()
 		if $RayCast2D.is_colliding():
 			var collider = $RayCast2D.get_collider()
 	
@@ -83,17 +83,34 @@ func _physics_process(_delta):
 			elif $RayCast2D.get_collider().collision_layer == 2: # object
 				pick_up_object()
 		
-		time_until_next_move = move_delay
+		# then move the segments
 		move_to_grid(current_direction)
+		
+		time_until_next_move = move_delay
+		
+func rotate_segments(dir):
+	for i in range(body_segments.size() - 1, 0, -1):
+		body_segments[i].rotation = body_segments[i-1].rotation
+			
+	rotation = dir.angle()
+	
+	for i in range(body_segments.size() - 1, 0, -1):
+		if body_segments[i].rotation != body_segments[i-1].rotation:
+			body_segments[i].get_node("Sprite2D").set_texture(curve_texture)
+			var degree = angle_difference(body_segments[i].rotation, body_segments[i-1].rotation)
+			if is_equal_approx(degree, -PI/2):
+				body_segments[i].get_node("Sprite2D").flip_v = true
+			else:
+				body_segments[i].get_node("Sprite2D").flip_v = false
+		else:
+			body_segments[i].get_node("Sprite2D").set_texture(body_texture)
 
 func move_to_grid(dir):		
 	for i in range(body_segments.size() - 1, 0, -1):
 		body_segments[i].position = body_segments[i-1].position
-		body_segments[i].rotation = body_segments[i-1].rotation
 		
 	var target_pos = position + (dir * grid_size)
 	position = target_pos
-	rotation = dir.angle()
 
 func pick_up_object() -> void:
 	# increase current score
