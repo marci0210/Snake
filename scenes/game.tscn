@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://dr60ts270ftii" path="res://assets/textures/snake_head.png" id="4_lbhrr"]
 [ext_resource type="PackedScene" uid="uid://ihiktphopn3t" path="res://scenes/BodySegments.tscn" id="6_gee14"]
 [ext_resource type="Texture2D" uid="uid://bfihi4we7dryf" path="res://assets/textures/apple.png" id="6_p57ef"]
+[ext_resource type="Texture2D" uid="uid://7r8pf241lecv" path="res://assets/textures/dinamit.png" id="8_gee14"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_lnu2h"]
 texture = ExtResource("2_yqjtg")
@@ -22,14 +23,10 @@ sources/0 = SubResource("TileSetAtlasSource_lnu2h")
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_iywne"]
 size = Vector2(40, 40)
 
-[sub_resource type="GDScript" id="GDScript_p57ef"]
-script/source = "extends Area2D
-
-func _on_area_2d_body_entered(body: CharacterBody2D) -> void:
-	print(\"body entered\")
-"
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_u5sy4"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gee14"]
+size = Vector2(40, 40)
 
 [node name="Game" type="Node2D" unique_id=810544287]
 
@@ -93,19 +90,26 @@ texture = ExtResource("4_lbhrr")
 [node name="SnakeArea2D" parent="." unique_id=1518778878 instance=ExtResource("6_gee14")]
 position = Vector2(-100, 400)
 
-[node name="ObjectArea2D" type="Area2D" parent="." unique_id=1758610149]
+[node name="FruitArea2D" type="Area2D" parent="." unique_id=1758610149]
 position = Vector2(420, 220)
 collision_layer = 2
 collision_mask = 2
-script = SubResource("GDScript_p57ef")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="ObjectArea2D" unique_id=1049078244]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="FruitArea2D" unique_id=1049078244]
 light_mask = 2
 visibility_layer = 2
 shape = SubResource("RectangleShape2D_u5sy4")
 
-[node name="Sprite2D" type="Sprite2D" parent="ObjectArea2D" unique_id=57889442]
+[node name="Sprite2D" type="Sprite2D" parent="FruitArea2D" unique_id=57889442]
 texture = ExtResource("6_p57ef")
 
+[node name="BombArea2D" type="Area2D" parent="." unique_id=607891104]
+position = Vector2(-56, 24)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BombArea2D" unique_id=2071934714]
+shape = SubResource("RectangleShape2D_gee14")
+
+[node name="Sprite2D" type="Sprite2D" parent="BombArea2D" unique_id=485660396]
+texture = ExtResource("8_gee14")
+
 [connection signal="pressed" from="PauseMenu/QuitButton" to="PauseMenu" method="_on_quit_button_pressed"]
-[connection signal="body_entered" from="ObjectArea2D" to="CharacterBody2D" method="_on_area_2d_body_entered"]

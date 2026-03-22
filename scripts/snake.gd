@@ -3,7 +3,10 @@ extends CharacterBody2D
 @export var tile_map: TileMapLayer
 @export var body_segment_scene: PackedScene
 
-@onready var design = $Sprite2D_head
+enum object_types {
+	FRUIT,
+	BOMB
+}
 
 var body_segments: Array = []
 
@@ -16,6 +19,10 @@ var new_target_direction = Vector2.ZERO
 
 var is_moving = true
 var prev_time_stamp = 0
+
+@onready var current_score = get_parent().get_node("CanvasLayer/Score")
+
+@onready var design = $Sprite2D_head
 
 @onready var curve_texture = preload("res://assets/textures/snake_curve.png")
 @onready var body_texture = preload("res://assets/textures/snake_body.png")
@@ -32,14 +39,10 @@ func _ready():
 	$RayCast2D.force_raycast_update()
 	
 	body_segments.append(self)
-	add_initial_segments()
-	add_initial_segments()
-	add_initial_segments()
-	add_initial_segments()
-	add_initial_segments()
-	add_initial_segments()
+	for i in range(1, 6):
+		add_new_segments()
 
-func add_initial_segments() -> void:
+func add_new_segments() -> void:
 	var new_segment = body_segment_scene.instantiate()
 	var last_segment = body_segments[-1]
 	if current_direction == Vector2.RIGHT:
@@ -64,7 +67,6 @@ func _physics_process(_delta):
 	elif Input.is_action_pressed("ui_right") and current_direction != Vector2.LEFT: 
 		new_target_direction = Vector2.RIGHT
 
-		
 	if time_until_next_move > 0:
 		time_until_next_move -= _delta
 		return
@@ -76,29 +78,47 @@ func _physics_process(_delta):
 		# rotate the segments
 		rotate_segments(current_direction)
 		
-		# in case of collision, update max score then exit
+		# in case of collision with wall, itself or fruit
 		var object_picked_up = false
 		$RayCast2D.force_raycast_update()
 		if $RayCast2D.is_colliding():
 			var collider = $RayCast2D.get_collider()
-	
-			if collider is TileMapLayer or $RayCast2D.get_collider().collision_layer == 1: # wall or snake itself
-				var current_score = get_parent().get_node("CanvasLayer/Score")
+			
+			# wall or snake itself
+			if collider is TileMapLayer or $RayCast2D.get_collider().collision_layer == 1:
 				Global.update_overall_high_score(int(current_score.text))
 				
 				Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 				get_tree().change_scene_to_file("res://scenes/homepage.tscn")
-			elif $RayCast2D.get_collider().collision_layer == 2: # object
+			# object
+			elif $RayCast2D.get_collider().collision_layer == 2:
 				object_picked_up = true
 				pick_up_object()
+				
 				# add new segment to the Snake
-				add_initial_segments()
+				add_new_segments()
 		
 		# then move the segments
 		move_to_grid(current_direction)
 		
 		if object_picked_up:
-			generate_new_object()
+			generate_new_object(object_types.FRUIT)
+			# generate a bomb
+			if int(current_score.text) >= 15:
+				generate_new_object(object_types.BOMB)
+				
+		# increase speed
+		if int(current_score.text) < 5:
+			move_delay = 0.5
+		elif int(current_score.text) < 10:
+			move_delay = 0.4
+		# at 15, generate a bomb
+		elif int(current_score.text) < 20:
+			move_delay = 0.3
+		elif int(current_score.text) < 25:
+			move_delay = 0.2
+		else:
+			move_delay = 0.1
 		
 		time_until_next_move = move_delay
 		
@@ -128,28 +148,20 @@ func move_to_grid(dir):
 
 func pick_up_object() -> void:
 	# increase current score
-	var current_score = get_parent().get_node("CanvasLayer/Score")
 	current_score.text = str(int(current_score.text) + 1)
 	
-	if int(current_score.text) == 5:
-		move_delay = 0.4
-	elif int(current_score.text) == 10:
-		move_delay = 0.3
-	elif int(current_score.text) == 15:
-		move_delay = 0.2
-	# todo: spawn bomb at 20
-	elif int(current_score.text) == 25:
-		move_delay = 0.1
-	
-func generate_new_object() -> void:
-	# generate new coordiante to the object
-	var object = get_parent().get_node("ObjectArea2D")
-	object.position = generate_random_grid_position()
-	
-	# generate random texture
-	var fruit_number = randi_range(0, 3)
-	print("new fruit number: " + str(fruit_number))
-	object.get_node("Sprite2D").set_texture(fruits_texture[fruit_number])
+func generate_new_object(type) -> void:
+	if type == object_types.FRUIT:
+		# generate new coordiante to the fruit
+		var fruit = get_parent().get_node("FruitArea2D")
+		fruit.position = generate_random_grid_position()
+		# generate random texture
+		var fruit_number = randi_range(0, 3)
+		fruit.get_node("Sprite2D").set_texture(fruits_texture[fruit_number])
+	elif type == object_types.BOMB:
+		# generate new coordiante to the bomb
+		var bomb = get_parent().get_node("BombArea2D")
+		bomb.position = generate_random_grid_position()
 	
 func generate_random_grid_position():
 	var position_free : bool = false
@@ -157,7 +169,6 @@ func generate_random_grid_position():
 		var random_x = randi_range(1, 18) 
 		var random_y = randi_range(1, 18)
 		
-		# todo: not generate under me
 		var new_pos = Vector2((random_x * grid_size) + 20, (random_y * grid_size) + 20)
 		position_free = is_cell_vacant(new_pos)
 		
@@ -170,7 +181,15 @@ func is_cell_vacant(grid_pos: Vector2i) -> bool:
 	
 	for segment in body_segments:
 		if tile_map_layer.local_to_map(segment.position) == target_map_pos:
-			print("reserved!!!")
 			return false
+			
+	var bomb = get_parent().get_node("BombArea2D")
+	if tile_map_layer.local_to_map(bomb.position) == target_map_pos:
+		return false
+		
+	var fruit = get_parent().get_node("FruitArea2D")
+	if tile_map_layer.local_to_map(fruit.position) == target_map_pos:
+		return false
+			
 
 	return true
